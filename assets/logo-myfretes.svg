@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="90" viewBox="0 0 320 90" role="img" aria-labelledby="title desc">
+  <title id="title">Logo MyFretes</title>
+  <desc id="desc">Globo amarelo com caminhão e texto MYFRETES em fundo roxo.</desc>
+  <rect width="320" height="90" rx="12" fill="#4B0082"/>
+  <circle cx="52" cy="45" r="28" fill="#FFD700"/>
+  <circle cx="52" cy="45" r="20" fill="none" stroke="#4B0082" stroke-width="2" opacity="0.45"/>
+  <path d="M30 45h44M52 23v44M37 30c4 4 8 6 15 6s11-2 15-6M37 60c4-4 8-6 15-6s11 2 15 6" fill="none" stroke="#4B0082" stroke-width="2" opacity="0.45"/>
+  <g transform="translate(27 42)" fill="#4B0082">
+    <rect x="0" y="0" width="26" height="10" rx="2"/>
+    <rect x="26" y="2" width="10" height="8" rx="1"/>
+    <circle cx="7" cy="12" r="3" fill="#2B004D"/>
+    <circle cx="27" cy="12" r="3" fill="#2B004D"/>
+  </g>
+  <text x="94" y="55" font-family="Montserrat, Arial, sans-serif" font-size="34" font-style="italic" font-weight="900" fill="#FFFFFF">MYFRETES</text>
+</svg>
