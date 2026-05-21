@@ -323,9 +323,11 @@ button:active{transform:scale(0.97);}
     <div id="ajudaDiv" class="hidden">
       <h4>Quantidade de Ajudantes</h4>
       <select id="quantidade_ajudante">
-        <option value="motorista">1 - ajuda do motorista</option>
-        <option value="1">1</option><option value="2">2</option>
-        <option value="3">3</option><option value="4">4</option>
+        <option value="" disabled selected>Selecione a quantidade</option>
+        <option value="1">1 ajudante (ajuda do motorista ou somente uma pessoa)</option>
+        <option value="2">2 ajudantes (duas pessoas para carga e descarga)</option>
+        <option value="3">3 ajudantes (três pessoas para carga e descarga)</option>
+        <option value="4">4 ajudantes (quatro pessoas para carga e descarga)</option>
       </select>
 
       <h4>📍 Retirada</h4>
@@ -769,8 +771,13 @@ SUFIXOS_FIXOS.forEach(sufixo => {
    ENVIO (preserva fluxo + bloco ROTA)
    ========================================================= */
 function descreverQtdAjudante(valor){
-    if(valor === "motorista") return "1 - ajuda do motorista";
-    return valor;
+    const map = {
+        "1": "1 ajudante (ajuda do motorista ou somente uma pessoa)",
+        "2": "2 ajudantes (duas pessoas para carga e descarga)",
+        "3": "3 ajudantes (três pessoas para carga e descarga)",
+        "4": "4 ajudantes (quatro pessoas para carga e descarga)"
+    };
+    return map[valor] || valor || "(não informado)";
 }
 
 function enviar(){
