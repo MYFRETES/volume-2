@@ -92,24 +92,25 @@ button:active{transform:scale(0.97);}
     0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}
 }
 
-/* ── Endereço (autocomplete Google) ── */
+/* ── Endereço (autocomplete Google) — segue o padrão dos demais inputs ── */
 .endereco-row{display:flex;gap:8px;align-items:flex-end;margin-top:8px;}
 .endereco-row input{margin-top:0;flex:1;}
 
+/* botão limpar discreto, casando com o roxo do contorno */
 .btn-loc{
     width:46px;min-width:46px;height:46px;padding:0;margin-top:0;
-    border-radius:10px;background:#8000ff;color:white;font-size:18px;
+    border-radius:10px;background:transparent;color:#8000ff;font-size:18px;
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;border:none;transition:0.2s;flex-shrink:0;
+    cursor:pointer;border:2px solid #8000ff;transition:0.2s;flex-shrink:0;
 }
-.btn-loc:hover{background:#6600cc;}
+.btn-loc:hover{background:#f3eaff;}
 .btn-loc:active{transform:scale(0.95);}
-.btn-loc:disabled{background:#aaa;cursor:not-allowed;}
+.btn-loc:disabled{opacity:0.5;cursor:not-allowed;}
 
 .endereco-resultado{
     margin-top:8px;padding:10px 12px;border-radius:10px;
-    border:2px solid #8000ff;background:#f9f4ff;font-size:14px;color:#333;
-    min-height:46px;display:none;
+    background:transparent;font-size:13px;color:#4B0082;
+    display:none;
 }
 .endereco-resultado.visivel{display:block;}
 
@@ -119,30 +120,38 @@ button:active{transform:scale(0.97);}
 .complemento-row{display:flex;gap:8px;margin-top:8px;}
 .complemento-row input{margin-top:0;flex:1;}
 
-/* ── Card de Rota ── */
-.rota-card{
-    background:linear-gradient(135deg,#4B0082,#6600cc);
-    color:white;padding:16px;border-radius:14px;
-    margin-bottom:15px;box-shadow:0 8px 20px rgba(0,0,0,0.25);
-    border:2px solid #FFD700;
-}
-.rota-card h4{color:#FFD700;margin:0 0 12px;}
-.rota-grid{display:flex;gap:10px;flex-wrap:wrap;}
+/* ── Card de Rota — segue o padrão branco dos demais cards ── */
+.rota-card.card{ padding:18px; }
+.rota-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
 .rota-box{
-    flex:1;min-width:120px;background:rgba(255,255,255,0.1);
-    padding:12px;border-radius:10px;text-align:center;
-    backdrop-filter:blur(4px);
+    flex:1;min-width:130px;
+    background:#f7f2ff;
+    border:2px solid #8000ff;
+    padding:14px;border-radius:12px;text-align:center;
+    transition:0.25s;
 }
-.rota-box .label{font-size:12px;opacity:0.8;margin-bottom:4px;}
-.rota-box .valor{font-size:20px;font-weight:bold;color:#FFD700;}
-.rota-status{font-size:13px;opacity:0.9;margin-top:8px;text-align:center;}
-.btn-rota{
-    background:#FFD700;color:#4B0082;border:none;padding:12px;
-    border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;
-    width:100%;margin-top:10px;transition:0.2s;
+.rota-box.preenchido{
+    background:#fffbe6;
+    border-color:#FFD700;
 }
-.btn-rota:hover{background:#ffcc00;}
-.btn-rota:disabled{background:#aaa;color:#555;cursor:not-allowed;}
+.rota-box .label{
+    font-size:12px;color:#4B0082;opacity:0.85;margin-bottom:6px;
+    text-transform:uppercase;letter-spacing:0.5px;font-weight:bold;
+}
+.rota-box .valor{
+    font-size:22px;font-weight:bold;color:#4B0082;
+}
+.rota-status{
+    font-size:13px;color:#4B0082;opacity:0.8;
+    margin-top:10px;text-align:center;
+}
+.rota-status.calculando::after{
+    content:"";display:inline-block;width:12px;height:12px;
+    margin-left:6px;border-radius:50%;
+    border:2px solid #8000ff;border-top-color:transparent;
+    animation:spin 0.8s linear infinite;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 
 /* override pac-container do Google p/ casar com o design */
 .pac-container{
@@ -277,21 +286,20 @@ button:active{transform:scale(0.97);}
     </div>
   </div>
 
-  <!-- ROTA -->
-  <div class="rota-card">
-    <h4>🗺️ Rota</h4>
+  <!-- ROTA (mesmo padrão dos demais cards) -->
+  <div class="card rota-card">
+    <h4>🗺️ Rota estimada</h4>
     <div class="rota-grid">
-      <div class="rota-box">
-        <div class="label">Distância total</div>
+      <div class="rota-box" id="rotaBoxDistancia">
+        <div class="label">Distância</div>
         <div class="valor" id="rotaDistancia">—</div>
       </div>
-      <div class="rota-box">
-        <div class="label">Tempo estimado</div>
+      <div class="rota-box" id="rotaBoxTempo">
+        <div class="label">Tempo de carro</div>
         <div class="valor" id="rotaTempo">—</div>
       </div>
     </div>
-    <div class="rota-status" id="rotaStatus">Preencha Coleta e Destino para calcular.</div>
-    <button class="btn-rota" id="btnCalcularRota" onclick="calcularRota()">🗺️ Calcular rota</button>
+    <div class="rota-status" id="rotaStatus">Preencha Coleta e Destino para calcular automaticamente.</div>
   </div>
 
   <!-- ITENS -->
@@ -467,18 +475,19 @@ button:active{transform:scale(0.97);}
                         formatted_address, lat, lng, place_id }
    ========================================================= */
 const dadosCEP   = {};
-const autocompletes = {};   // sufixo -> google.maps.places.Autocomplete
+const autocompletes = {};
 const SUFIXOS_FIXOS = ["Coleta","Parada1","Parada2","Parada3","Destino"];
 
-let rotaUltima = null;      // { distanciaKm, duracaoTexto }
-let debounceRota = null;
+let rotaUltima      = null;   // { distanciaKm, duracaoTexto }
+let debounceRota    = null;
+let rotaRequestId   = 0;      // evita race condition entre chamadas concorrentes
 
 /* =========================================================
    GOOGLE MAPS — callback do <script async>
    ========================================================= */
 function initMaps(){
     SUFIXOS_FIXOS.forEach(criarAutocomplete);
-    setRotaStatus("Preencha Coleta e Destino para calcular.");
+    setRotaStatus("Preencha Coleta e Destino para calcular automaticamente.");
 }
 
 function criarAutocomplete(sufixo){
@@ -498,25 +507,25 @@ function criarAutocomplete(sufixo){
             return;
         }
         salvarPlace(sufixo, place);
-        agendarRecalculoRota();
+        // recálculo imediato — sem atraso perceptível ao usuário
+        calcularRota();
     });
 
     autocompletes[sufixo] = ac;
 }
 
-/* extrai address_components em um objeto compatível com o antigo dadosCEP */
 function extrairComponentes(place){
     const out = { logradouro:"", bairro:"", localidade:"", uf:"", cep:"" };
     (place.address_components || []).forEach(c => {
         const t = c.types || [];
-        if(t.includes("route"))                        out.logradouro = c.long_name;
+        if(t.includes("route"))                            out.logradouro = c.long_name;
         else if(t.includes("sublocality") ||
                 t.includes("sublocality_level_1") ||
-                t.includes("neighborhood"))            out.bairro     = c.long_name;
+                t.includes("neighborhood"))                out.bairro     = c.long_name;
         else if(t.includes("administrative_area_level_2") ||
-                t.includes("locality"))                out.localidade = out.localidade || c.long_name;
-        else if(t.includes("administrative_area_level_1")) out.uf      = c.short_name;
-        else if(t.includes("postal_code"))             out.cep        = c.long_name;
+                t.includes("locality"))                    out.localidade = out.localidade || c.long_name;
+        else if(t.includes("administrative_area_level_1")) out.uf         = c.short_name;
+        else if(t.includes("postal_code"))                 out.cep        = c.long_name;
     });
     return out;
 }
@@ -531,16 +540,13 @@ function salvarPlace(sufixo, place){
         place_id: place.place_id || ""
     };
 
-    // limpa erro
     const erro = document.getElementById("erro" + sufixo);
     erro.classList.remove("visivel"); erro.textContent = "";
 
-    // mostra resultado
     const div = document.getElementById("resultado" + sufixo);
-    div.innerHTML = "📍 " + (place.formatted_address || "Endereço selecionado");
+    div.innerHTML = "✓ " + (place.formatted_address || "Endereço selecionado");
     div.classList.add("visivel");
 
-    // libera número / complemento
     const row = document.getElementById("complemento" + sufixo + "Row");
     if(row) row.classList.remove("hidden");
 }
@@ -561,11 +567,11 @@ function limparEndereco(sufixo){
     if(row) row.classList.add("hidden");
     const erro  = document.getElementById("erro" + sufixo);
     erro.classList.remove("visivel"); erro.textContent = "";
-    agendarRecalculoRota();
+    calcularRota();
 }
 
 /* =========================================================
-   MONTAGEM DO ENDEREÇO (mantém assinatura usada em enviar())
+   MONTAGEM DO ENDEREÇO (assinatura preservada)
    ========================================================= */
 function montarEndereco(sufixo){
     const d = dadosCEP[sufixo];
@@ -574,8 +580,6 @@ function montarEndereco(sufixo){
     const numero      = (document.getElementById("numero"      + sufixo) || {}).value || "";
     const complemento = (document.getElementById("complemento" + sufixo) || {}).value || "";
 
-    // se o usuário só selecionou no autocomplete, usa formatted_address;
-    // se preencheu número/complemento, monta string detalhada.
     if(!numero && !complemento && d.formatted_address){
         return d.formatted_address;
     }
@@ -591,31 +595,40 @@ function montarEndereco(sufixo){
 }
 
 /* =========================================================
-   ROTA — DirectionsService
+   ROTA — automática, sem botão
    ========================================================= */
-function setRotaStatus(txt){
+function setRotaStatus(txt, calculando){
     const el = document.getElementById("rotaStatus");
-    if(el) el.textContent = txt;
+    if(!el) return;
+    el.textContent = txt;
+    el.classList.toggle("calculando", !!calculando);
 }
 
+function resetRotaUI(msg){
+    document.getElementById("rotaDistancia").textContent = "—";
+    document.getElementById("rotaTempo").textContent     = "—";
+    document.getElementById("rotaBoxDistancia").classList.remove("preenchido");
+    document.getElementById("rotaBoxTempo").classList.remove("preenchido");
+    setRotaStatus(msg, false);
+    rotaUltima = null;
+}
+
+/* debounce só usado p/ mudanças não atômicas (ex.: alterar nº de paradas) */
 function agendarRecalculoRota(){
     clearTimeout(debounceRota);
-    debounceRota = setTimeout(calcularRota, 600);
+    debounceRota = setTimeout(calcularRota, 300);
 }
 
 function calcularRota(){
     if(typeof google === "undefined" || !google.maps){
-        setRotaStatus("Aguardando carregamento do mapa...");
+        setRotaStatus("Aguardando carregamento do mapa...", true);
         return;
     }
 
     const origem  = dadosCEP["Coleta"];
     const destino = dadosCEP["Destino"];
     if(!origem || !destino){
-        document.getElementById("rotaDistancia").textContent = "—";
-        document.getElementById("rotaTempo").textContent     = "—";
-        setRotaStatus("Preencha Coleta e Destino para calcular.");
-        rotaUltima = null;
+        resetRotaUI("Preencha Coleta e Destino para calcular automaticamente.");
         return;
     }
 
@@ -626,9 +639,8 @@ function calcularRota(){
         if(p) waypoints.push({ location: { lat: p.lat, lng: p.lng }, stopover: true });
     }
 
-    setRotaStatus("Calculando rota...");
-    const btn = document.getElementById("btnCalcularRota");
-    if(btn) btn.disabled = true;
+    const myId = ++rotaRequestId;
+    setRotaStatus("Calculando rota", true);
 
     const service = new google.maps.DirectionsService();
     service.route({
@@ -639,13 +651,11 @@ function calcularRota(){
         travelMode: google.maps.TravelMode.DRIVING,
         region: "br"
     }, (result, status) => {
-        if(btn) btn.disabled = false;
+        // descarta respostas obsoletas
+        if(myId !== rotaRequestId) return;
 
         if(status !== "OK" || !result || !result.routes || !result.routes[0]){
-            setRotaStatus("Não foi possível calcular a rota (" + status + ").");
-            document.getElementById("rotaDistancia").textContent = "—";
-            document.getElementById("rotaTempo").textContent     = "—";
-            rotaUltima = null;
+            resetRotaUI("Não foi possível calcular a rota (" + status + ").");
             return;
         }
 
@@ -655,13 +665,14 @@ function calcularRota(){
             segundos += leg.duration ? leg.duration.value : 0;
         });
 
-        const km          = (metros / 1000);
-        const kmTxt       = km.toLocaleString("pt-BR",{maximumFractionDigits:1}) + " km";
-        const duracaoTxt  = formatarDuracao(segundos);
+        const kmTxt      = (metros/1000).toLocaleString("pt-BR",{maximumFractionDigits:1}) + " km";
+        const duracaoTxt = formatarDuracao(segundos);
 
         document.getElementById("rotaDistancia").textContent = kmTxt;
         document.getElementById("rotaTempo").textContent     = duracaoTxt;
-        setRotaStatus("Rota calculada com sucesso ✅");
+        document.getElementById("rotaBoxDistancia").classList.add("preenchido");
+        document.getElementById("rotaBoxTempo").classList.add("preenchido");
+        setRotaStatus("Rota calculada automaticamente ✅", false);
 
         rotaUltima = { distanciaKm: kmTxt, duracaoTexto: duracaoTxt };
     });
@@ -742,7 +753,7 @@ document.getElementById("horario").addEventListener("input", function(e){
     e.target.value = v;
 });
 
-/* limpa estado se usuário apagar tudo manualmente no campo de endereço */
+/* limpa estado se usuário apagar tudo no campo de endereço */
 SUFIXOS_FIXOS.forEach(sufixo => {
     const input = document.getElementById("cep" + sufixo);
     if(!input) return;
@@ -754,7 +765,7 @@ SUFIXOS_FIXOS.forEach(sufixo => {
 });
 
 /* =========================================================
-   ENVIO (preserva fluxo + adiciona bloco ROTA)
+   ENVIO (preserva fluxo + bloco ROTA)
    ========================================================= */
 function enviar(){
     const qtdParadas = parseInt(document.getElementById("parada").value, 10);
@@ -828,9 +839,8 @@ function enviar(){
     window.open("https://wa.me/5531975135130?text=" + msg, "_blank");
 }
 
-/* tratamento global de erro de auth do Google Maps */
 window.gm_authFailure = function(){
-    setRotaStatus("Falha de autenticação Google Maps (verifique restrições da chave).");
+    setRotaStatus("Falha de autenticação Google Maps (verifique restrições da chave).", false);
     SUFIXOS_FIXOS.forEach(s => mostrarErro(s, "Falha ao carregar Google Maps."));
 };
 </script>
