@@ -323,6 +323,7 @@ button:active{transform:scale(0.97);}
     <div id="ajudaDiv" class="hidden">
       <h4>Quantidade de Ajudantes</h4>
       <select id="quantidade_ajudante">
+        <option value="motorista">1 - ajuda do motorista</option>
         <option value="1">1</option><option value="2">2</option>
         <option value="3">3</option><option value="4">4</option>
       </select>
@@ -767,6 +768,11 @@ SUFIXOS_FIXOS.forEach(sufixo => {
 /* =========================================================
    ENVIO (preserva fluxo + bloco ROTA)
    ========================================================= */
+function descreverQtdAjudante(valor){
+    if(valor === "motorista") return "1 - ajuda do motorista";
+    return valor;
+}
+
 function enviar(){
     const qtdParadas = parseInt(document.getElementById("parada").value, 10);
 
@@ -800,7 +806,8 @@ function enviar(){
     }
 
     if(document.getElementById("ajuda").value === "sim"){
-        msg += `👷 *AJUDANTES*%0AQuantidade: ${document.getElementById("quantidade_ajudante").value}%0A%0A`;
+        const qtdAjudVal = document.getElementById("quantidade_ajudante").value;
+        msg += `👷 *AJUDANTES*%0AQuantidade: ${descreverQtdAjudante(qtdAjudVal)}%0A%0A`;
         msg += `🔹 RETIRADA%0A`;
         msg += `Tipo local: ${document.getElementById("acesso1").value}%0A`;
         msg += `Fácil acesso: ${document.getElementById("local1").value}%0A`;
