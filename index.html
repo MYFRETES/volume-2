@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYfretes</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,800;1,900&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+    margin:0;
+    font-family: Arial;
+    background: linear-gradient(180deg,#4B0082,#1a0033);
+    color:white;
+}
+
+.logo{
+    text-align:center;
+    font-size:42px;
+    margin:25px 0 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.logo span:nth-child(1){color:#FFD700;font-style:italic;}
+.logo span:nth-child(2){
+    color:white;font-style:italic;
+    text-shadow:2px 2px 0 #8000ff,-2px -2px 0 #8000ff,0px 0px 10px rgba(128,0,255,0.6);
+}
+
+.subtext{text-align:center;font-size:14px;opacity:0.9;margin-bottom:15px;}
+
+.feedback-container{
+    position:relative;height:40px;margin-bottom:10px;
+    display:flex;justify-content:center;align-items:center;overflow:hidden;
+}
+
+.feedback{
+    position:absolute;background:rgba(255,255,255,0.95);color:#4B0082;
+    padding:8px 14px;border-radius:20px;font-size:13px;font-weight:bold;
+    box-shadow:0 5px 15px rgba(0,0,0,0.2);opacity:0;transform:translateY(10px);
+    transition:all 0.5s ease;
+}
+.feedback.active{opacity:1;transform:translateY(0);}
+
+.container{max-width:500px;margin:auto;padding:15px;}
+
+.card{
+    background:white;color:black;padding:18px;border-radius:14px;
+    margin-bottom:15px;box-shadow:0 8px 20px rgba(0,0,0,0.25);
+}
+
+h4{margin:0 0 10px;color:#4B0082;}
+
+.row{display:flex;gap:10px;}
+.row input,.row select{flex:1;}
+
+input,select,textarea{
+    width:100%;padding:12px;margin-top:8px;border-radius:10px;
+    border:2px solid #8000ff;font-size:14px;
+}
+
+textarea{min-height:100px;resize:vertical;font-family:Arial;}
+
+input:focus,select:focus,textarea:focus{
+    outline:none;border-color:#FFD700;box-shadow:0 0 5px #FFD700;
+}
+
+button{
+    width:100%;padding:16px;border:none;border-radius:12px;
+    background:#FFD700;color:#4B0082;font-weight:bold;font-size:16px;
+    margin-top:10px;cursor:pointer;transition:0.2s;
+}
+button:hover{background:#ffcc00;}
+button:active{transform:scale(0.97);}
+
+.hidden{display:none;}
+
+.whatsapp-float{
+    position:fixed;top:15px;right:15px;background:#25D366;color:white;
+    padding:10px 12px;border-radius:50px;font-size:14px;font-weight:bold;
+    text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    display:flex;align-items:center;gap:6px;z-index:999;transition:0.3s;
+    animation:pulse 2s infinite;
+}
+.whatsapp-float:hover{transform:scale(1.05);}
+
+@keyframes pulse{
+    0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}
+}
+
+/* ── Endereço (autocomplete Google) ── */
+.endereco-row{display:flex;gap:8px;align-items:flex-end;margin-top:8px;}
+.endereco-row input{margin-top:0;flex:1;}
+
+.btn-loc{
+    width:46px;min-width:46px;height:46px;padding:0;margin-top:0;
+    border-radius:10px;background:#8000ff;color:white;font-size:18px;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;border:none;transition:0.2s;flex-shrink:0;
+}
+.btn-loc:hover{background:#6600cc;}
+.btn-loc:active{transform:scale(0.95);}
+.btn-loc:disabled{background:#aaa;cursor:not-allowed;}
+
+.endereco-resultado{
+    margin-top:8px;padding:10px 12px;border-radius:10px;
+    border:2px solid #8000ff;background:#f9f4ff;font-size:14px;color:#333;
+    min-height:46px;display:none;
+}
+.endereco-resultado.visivel{display:block;}
+
+.cep-erro{color:#cc0000;font-size:12px;margin-top:4px;display:none;}
+.cep-erro.visivel{display:block;}
+
+.complemento-row{display:flex;gap:8px;margin-top:8px;}
+.complemento-row input{margin-top:0;flex:1;}
+
+/* ── Card de Rota ── */
+.rota-card{
+    background:linear-gradient(135deg,#4B0082,#6600cc);
+    color:white;padding:16px;border-radius:14px;
+    margin-bottom:15px;box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    border:2px solid #FFD700;
+}
+.rota-card h4{color:#FFD700;margin:0 0 12px;}
+.rota-grid{display:flex;gap:10px;flex-wrap:wrap;}
+.rota-box{
+    flex:1;min-width:120px;background:rgba(255,255,255,0.1);
+    padding:12px;border-radius:10px;text-align:center;
+    backdrop-filter:blur(4px);
+}
+.rota-box .label{font-size:12px;opacity:0.8;margin-bottom:4px;}
+.rota-box .valor{font-size:20px;font-weight:bold;color:#FFD700;}
+.rota-status{font-size:13px;opacity:0.9;margin-top:8px;text-align:center;}
+.btn-rota{
+    background:#FFD700;color:#4B0082;border:none;padding:12px;
+    border-radius:10px;font-weight:bold;font-size:14px;cursor:pointer;
+    width:100%;margin-top:10px;transition:0.2s;
+}
+.btn-rota:hover{background:#ffcc00;}
+.btn-rota:disabled{background:#aaa;color:#555;cursor:not-allowed;}
+
+/* override pac-container do Google p/ casar com o design */
+.pac-container{
+    border-radius:10px;border:2px solid #8000ff;margin-top:2px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);font-family:Arial;
+}
+.pac-item{padding:8px 10px;cursor:pointer;}
+.pac-item:hover{background:#f3eaff;}
+.pac-item-query{color:#4B0082;font-weight:bold;}
+</style>
+</head>
+
+<body>
+<a class="whatsapp-float" href="https://wa.me/5531975135130" target="_blank">💬 WhatsApp</a>
+
+<div class="logo"><span>MY</span><span>fretes</span></div>
+
+<div class="feedback-container">
+    <div class="feedback active">🚛 "Chegou super rápido, recomendo demais!"</div>
+    <div class="feedback">⭐ "Melhor frete que já contratei!"</div>
+    <div class="feedback">📦 "Equipe cuidadosa e muito educada."</div>
+    <div class="feedback">💰 "Preço justo e serviço top!"</div>
+    <div class="feedback">⚡ "Atendimento rápido pelo WhatsApp!"</div>
+    <div class="feedback">"Fiz minha mudança com a myfretes, super recomendo!!!"</div>
+    <div class="feedback">"Atendimento rapido, equipe preparada, obrigada!!!"</div>
+    <div class="feedback">"Serviço nota 10!, leve minha mudança de Belo Horizonte para Cuiaba, equipe atenciosa e educada, irei recomendar."</div>
+</div>
+
+<div class="subtext">Preencha suas informações e envie seu orçamento</div>
+<div class="subtext">Simples, rápido e sem burocracia.</div>
+
+<div class="container">
+
+  <!-- DADOS PESSOAIS -->
+  <div class="card">
+    <h4>👤 Dados</h4>
+    <input id="nome" placeholder="Nome">
+    <input id="telefone" placeholder="Telefone" inputmode="numeric">
+  </div>
+
+  <!-- DATA E HORÁRIO -->
+  <div class="card">
+    <h4>📅 Data e Horário do Frete</h4>
+    <div class="row">
+      <input id="data" placeholder="Data (dd/mm/aaaa)" maxlength="10">
+      <input id="horario" placeholder="Horário (hh:mm)" maxlength="5">
+    </div>
+  </div>
+
+  <!-- COLETA -->
+  <div class="card">
+    <h4>📍 Coleta</h4>
+    <div class="endereco-row">
+      <input id="cepColeta" placeholder="Digite o endereço (rua, número, cidade...)" autocomplete="off">
+      <button class="btn-loc" id="btnColeta" onclick="limparEndereco('Coleta')" title="Limpar endereço">✖</button>
+    </div>
+    <span class="cep-erro" id="erroColeta"></span>
+    <div class="endereco-resultado" id="resultadoColeta"></div>
+    <div class="complemento-row hidden" id="complementoColetaRow">
+      <input id="numeroColeta" placeholder="Número" style="max-width:100px;">
+      <input id="complementoColeta" placeholder="Complemento (apto, bloco...)">
+    </div>
+  </div>
+
+  <!-- PARADAS -->
+  <div class="card">
+    <h4>Adicionar paradas?</h4>
+    <select id="parada" onchange="toggleParadas()">
+      <option value="0">Não</option>
+      <option value="1">1 parada</option>
+      <option value="2">2 paradas</option>
+      <option value="3">3 paradas</option>
+    </select>
+
+    <div id="paradasContainer">
+      <div id="parada1Div" class="hidden">
+        <h4 style="margin-top:14px;">📍 Parada 1</h4>
+        <div class="endereco-row">
+          <input id="cepParada1" placeholder="Digite o endereço..." autocomplete="off">
+          <button class="btn-loc" id="btnParada1" onclick="limparEndereco('Parada1')" title="Limpar endereço">✖</button>
+        </div>
+        <span class="cep-erro" id="erroParada1"></span>
+        <div class="endereco-resultado" id="resultadoParada1"></div>
+        <div class="complemento-row hidden" id="complementoParada1Row">
+          <input id="numeroParada1" placeholder="Número" style="max-width:100px;">
+          <input id="complementoParada1" placeholder="Complemento (apto, bloco...)">
+        </div>
+      </div>
+
+      <div id="parada2Div" class="hidden">
+        <h4 style="margin-top:14px;">📍 Parada 2</h4>
+        <div class="endereco-row">
+          <input id="cepParada2" placeholder="Digite o endereço..." autocomplete="off">
+          <button class="btn-loc" id="btnParada2" onclick="limparEndereco('Parada2')" title="Limpar endereço">✖</button>
+        </div>
+        <span class="cep-erro" id="erroParada2"></span>
+        <div class="endereco-resultado" id="resultadoParada2"></div>
+        <div class="complemento-row hidden" id="complementoParada2Row">
+          <input id="numeroParada2" placeholder="Número" style="max-width:100px;">
+          <input id="complementoParada2" placeholder="Complemento (apto, bloco...)">
+        </div>
+      </div>
+
+      <div id="parada3Div" class="hidden">
+        <h4 style="margin-top:14px;">📍 Parada 3</h4>
+        <div class="endereco-row">
+          <input id="cepParada3" placeholder="Digite o endereço..." autocomplete="off">
+          <button class="btn-loc" id="btnParada3" onclick="limparEndereco('Parada3')" title="Limpar endereço">✖</button>
+        </div>
+        <span class="cep-erro" id="erroParada3"></span>
+        <div class="endereco-resultado" id="resultadoParada3"></div>
+        <div class="complemento-row hidden" id="complementoParada3Row">
+          <input id="numeroParada3" placeholder="Número" style="max-width:100px;">
+          <input id="complementoParada3" placeholder="Complemento (apto, bloco...)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESTINO -->
+  <div class="card">
+    <h4>📍 Destino</h4>
+    <div class="endereco-row">
+      <input id="cepDestino" placeholder="Digite o endereço..." autocomplete="off">
+      <button class="btn-loc" id="btnDestino" onclick="limparEndereco('Destino')" title="Limpar endereço">✖</button>
+    </div>
+    <span class="cep-erro" id="erroDestino"></span>
+    <div class="endereco-resultado" id="resultadoDestino"></div>
+    <div class="complemento-row hidden" id="complementoDestinoRow">
+      <input id="numeroDestino" placeholder="Número" style="max-width:100px;">
+      <input id="complementoDestino" placeholder="Complemento (apto, bloco...)">
+    </div>
+  </div>
+
+  <!-- ROTA -->
+  <div class="rota-card">
+    <h4>🗺️ Rota</h4>
+    <div class="rota-grid">
+      <div class="rota-box">
+        <div class="label">Distância total</div>
+        <div class="valor" id="rotaDistancia">—</div>
+      </div>
+      <div class="rota-box">
+        <div class="label">Tempo estimado</div>
+        <div class="valor" id="rotaTempo">—</div>
+      </div>
+    </div>
+    <div class="rota-status" id="rotaStatus">Preencha Coleta e Destino para calcular.</div>
+    <button class="btn-rota" id="btnCalcularRota" onclick="calcularRota()">🗺️ Calcular rota</button>
+  </div>
+
+  <!-- ITENS -->
+  <div class="card">
+    <h4>📦 Itens a transportar</h4>
+    <textarea id="itens" placeholder="Liste todos os itens (um por linha)"></textarea>
+    <div>⚠️ É essencial listar todos os itens corretamente para evitar alteração no valor final.</div>
+  </div>
+
+  <!-- AJUDANTES -->
+  <div class="card">
+    <h4>👥 Precisa de ajudante?</h4>
+    <select id="ajuda" onchange="toggleAjuda()">
+      <option value="nao">Não</option>
+      <option value="sim">Sim</option>
+    </select>
+
+    <h4 style="margin-top:15px;">📝 Observações adicionais</h4>
+    <textarea id="observacoes" placeholder="Ex: horário de preferência, restrições de acesso, portaria, etc."></textarea>
+
+    <div id="ajudaDiv" class="hidden">
+      <h4>Quantidade de Ajudantes</h4>
+      <select id="quantidade_ajudante">
+        <option value="1">1</option><option value="2">2</option>
+        <option value="3">3</option><option value="4">4</option>
+      </select>
+
+      <h4>📍 Retirada</h4>
+      <div class="row">
+        <select id="acesso1">
+          <option value="">Tipo do local</option>
+          <option value="casa">Casa</option>
+          <option value="apartamento">Apartamento</option>
+          <option value="loja">Loja</option>
+        </select>
+        <select id="local1">
+          <option value="">Fácil acesso?</option>
+          <option value="nao">não</option>
+          <option value="sim">sim</option>
+        </select>
+      </div>
+      <select id="escadas1" onchange="nivel('1')">
+        <option value="">Tipo de acesso</option>
+        <option value="escadas">Escadas</option><option value="elevador">Elevador</option>
+        <option value="plano">Plano</option><option value="beco">Beco</option>
+      </select>
+      <select id="nivel1" class="hidden">
+        <option value="">Quantidade de andares</option>
+        <option value="1">1 andar</option><option value="2">2 andares</option><option value="3">3 andares</option>
+        <option value="4">4 andares</option><option value="5">5 andares</option><option value="6">6 andares</option>
+        <option value="7">7 andares</option><option value="8">8 andares</option><option value="9">9 andares</option>
+        <option value="10">10 andares</option><option value="11">11 andares</option><option value="12">12 andares</option>
+        <option value="13">13 andares</option><option value="14">14 andares</option><option value="15">15 andares</option>
+        <option value="16">16 andares</option><option value="17">17 andares</option><option value="18">18 andares</option>
+        <option value="19">19 andares</option><option value="20">20 andares</option><option value="21">21 andares</option>
+        <option value="22">22 andares</option><option value="23">23 andares</option>
+      </select>
+
+      <!-- PARADAS AJUDANTES -->
+      <div id="paradaAjuda1" class="hidden">
+        <h4>📍 Parada 1 (ajudantes)</h4>
+        <div class="row">
+          <select id="acessoP1"><option value="">Tipo do local</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="loja">Loja</option></select>
+          <select id="localP1"><option value="">Fácil Acesso?</option><option value="sim">Sim</option><option value="nao">Não</option></select>
+        </div>
+        <select id="escadasP1" onchange="nivel('P1')">
+          <option value="">Tipo de acesso</option><option value="escadas">Escadas</option>
+          <option value="elevador">Elevador</option><option value="plano">Plano</option><option value="beco">Beco</option>
+        </select>
+        <select id="nivelP1" class="hidden">
+          <option value="">Quantidade de andares</option>
+          <option value="1">1 andar</option><option value="2">2 andares</option><option value="3">3 andares</option>
+          <option value="4">4 andares</option><option value="5">5 andares</option><option value="6">6 andares</option>
+          <option value="7">7 andares</option><option value="8">8 andares</option><option value="9">9 andares</option>
+          <option value="10">10 andares</option><option value="11">11 andares</option><option value="12">12 andares</option>
+          <option value="13">13 andares</option><option value="14">14 andares</option><option value="15">15 andares</option>
+          <option value="16">16 andares</option><option value="17">17 andares</option><option value="18">18 andares</option>
+          <option value="19">19 andares</option><option value="20">20 andares</option><option value="21">21 andares</option>
+          <option value="22">22 andares</option><option value="23">23 andares</option>
+        </select>
+      </div>
+
+      <div id="paradaAjuda2" class="hidden">
+        <h4>📍 Parada 2 (ajudantes)</h4>
+        <div class="row">
+          <select id="acessoP2"><option value="">Tipo do local</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="loja">Loja</option></select>
+          <select id="localP2"><option value="">Fácil Acesso?</option><option value="sim">Sim</option><option value="nao">Não</option></select>
+        </div>
+        <select id="escadasP2" onchange="nivel('P2')">
+          <option value="">Tipo de acesso</option><option value="escadas">Escadas</option>
+          <option value="elevador">Elevador</option><option value="plano">Plano</option><option value="beco">Beco</option>
+        </select>
+        <select id="nivelP2" class="hidden">
+          <option value="">Quantidade de andares</option>
+          <option value="1">1 andar</option><option value="2">2 andares</option><option value="3">3 andares</option>
+          <option value="4">4 andares</option><option value="5">5 andares</option><option value="6">6 andares</option>
+          <option value="7">7 andares</option><option value="8">8 andares</option><option value="9">9 andares</option>
+          <option value="10">10 andares</option><option value="11">11 andares</option><option value="12">12 andares</option>
+          <option value="13">13 andares</option><option value="14">14 andares</option><option value="15">15 andares</option>
+          <option value="16">16 andares</option><option value="17">17 andares</option><option value="18">18 andares</option>
+          <option value="19">19 andares</option><option value="20">20 andares</option><option value="21">21 andares</option>
+          <option value="22">22 andares</option><option value="23">23 andares</option>
+        </select>
+      </div>
+
+      <div id="paradaAjuda3" class="hidden">
+        <h4>📍 Parada 3 (ajudantes)</h4>
+        <div class="row">
+          <select id="acessoP3"><option value="">Tipo do local</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="loja">Loja</option></select>
+          <select id="localP3"><option value="">Fácil Acesso?</option><option value="sim">Sim</option><option value="nao">Não</option></select>
+        </div>
+        <select id="escadasP3" onchange="nivel('P3')">
+          <option value="">Tipo de acesso</option><option value="escadas">Escadas</option>
+          <option value="elevador">Elevador</option><option value="plano">Plano</option><option value="beco">Beco</option>
+        </select>
+        <select id="nivelP3" class="hidden">
+          <option value="">Quantidade de andares</option>
+          <option value="1">1 andar</option><option value="2">2 andares</option><option value="3">3 andares</option>
+          <option value="4">4 andares</option><option value="5">5 andares</option><option value="6">6 andares</option>
+          <option value="7">7 andares</option><option value="8">8 andares</option><option value="9">9 andares</option>
+          <option value="10">10 andares</option><option value="11">11 andares</option><option value="12">12 andares</option>
+          <option value="13">13 andares</option><option value="14">14 andares</option><option value="15">15 andares</option>
+          <option value="16">16 andares</option><option value="17">17 andares</option><option value="18">18 andares</option>
+          <option value="19">19 andares</option><option value="20">20 andares</option><option value="21">21 andares</option>
+          <option value="22">22 andares</option><option value="23">23 andares</option>
+        </select>
+      </div>
+
+      <h4>📍 Destino</h4>
+      <div class="row">
+        <select id="acesso2"><option value="">Tipo do local</option><option value="casa">Casa</option><option value="apartamento">Apartamento</option><option value="loja">Loja</option></select>
+        <select id="local2"><option value="">Fácil acesso?</option><option value="nao">não</option><option value="sim">sim</option></select>
+      </div>
+      <select id="escadas2" onchange="nivel('2')">
+        <option value="">Tipo de acesso</option><option value="escadas">Escadas</option>
+        <option value="elevador">Elevador</option><option value="plano">Plano</option><option value="beco">Beco</option>
+      </select>
+      <select id="nivel2" class="hidden">
+        <option value="">Quantidade de andares</option>
+        <option value="1">1 andar</option><option value="2">2 andares</option><option value="3">3 andares</option>
+        <option value="4">4 andares</option><option value="5">5 andares</option><option value="6">6 andares</option>
+        <option value="7">7 andares</option><option value="8">8 andares</option><option value="9">9 andares</option>
+        <option value="10">10 andares</option><option value="11">11 andares</option><option value="12">12 andares</option>
+        <option value="13">13 andares</option><option value="14">14 andares</option><option value="15">15 andares</option>
+        <option value="16">16 andares</option><option value="17">17 andares</option><option value="18">18 andares</option>
+        <option value="19">19 andares</option><option value="20">20 andares</option><option value="21">21 andares</option>
+        <option value="22">22 andares</option><option value="23">23 andares</option>
+      </select>
+
+      <h4>🧰 Itens a Desmontar?</h4>
+      <select id="desmontar" onchange="toggleDesmontar()">
+        <option value="nao">Não</option>
+        <option value="sim">Sim</option>
+      </select>
+      <input id="itensDesmontar" class="hidden" placeholder="Quais itens?">
+
+      <h4>📦 Embalagem dos Itens</h4>
+      <select id="embalagem">
+        <option value="nao">Não</option>
+        <option value="sim">Sim, embalagem completa</option>
+      </select>
+    </div>
+  </div>
+
+  <button onclick="enviar()">ENVIAR ORÇAMENTO NO WHATSAPP 🚀</button>
+
+</div>
+
+<script>
+/* =========================================================
+   ESTADO GLOBAL — mantém contrato com montarEndereco()
+   dadosCEP[sufixo] = { logradouro, bairro, localidade, uf, cep,
+                        formatted_address, lat, lng, place_id }
+   ========================================================= */
+const dadosCEP   = {};
+const autocompletes = {};   // sufixo -> google.maps.places.Autocomplete
+const SUFIXOS_FIXOS = ["Coleta","Parada1","Parada2","Parada3","Destino"];
+
+let rotaUltima = null;      // { distanciaKm, duracaoTexto }
+let debounceRota = null;
+
+/* =========================================================
+   GOOGLE MAPS — callback do <script async>
+   ========================================================= */
+function initMaps(){
+    SUFIXOS_FIXOS.forEach(criarAutocomplete);
+    setRotaStatus("Preencha Coleta e Destino para calcular.");
+}
+
+function criarAutocomplete(sufixo){
+    const input = document.getElementById("cep" + sufixo);
+    if(!input || autocompletes[sufixo]) return;
+
+    const ac = new google.maps.places.Autocomplete(input, {
+        componentRestrictions: { country: "br" },
+        fields: ["address_components","formatted_address","geometry","place_id"],
+        types: ["geocode"]
+    });
+
+    ac.addListener("place_changed", () => {
+        const place = ac.getPlace();
+        if(!place || !place.geometry){
+            mostrarErro(sufixo, "Selecione um endereço da lista de sugestões.");
+            return;
+        }
+        salvarPlace(sufixo, place);
+        agendarRecalculoRota();
+    });
+
+    autocompletes[sufixo] = ac;
+}
+
+/* extrai address_components em um objeto compatível com o antigo dadosCEP */
+function extrairComponentes(place){
+    const out = { logradouro:"", bairro:"", localidade:"", uf:"", cep:"" };
+    (place.address_components || []).forEach(c => {
+        const t = c.types || [];
+        if(t.includes("route"))                        out.logradouro = c.long_name;
+        else if(t.includes("sublocality") ||
+                t.includes("sublocality_level_1") ||
+                t.includes("neighborhood"))            out.bairro     = c.long_name;
+        else if(t.includes("administrative_area_level_2") ||
+                t.includes("locality"))                out.localidade = out.localidade || c.long_name;
+        else if(t.includes("administrative_area_level_1")) out.uf      = c.short_name;
+        else if(t.includes("postal_code"))             out.cep        = c.long_name;
+    });
+    return out;
+}
+
+function salvarPlace(sufixo, place){
+    const comp = extrairComponentes(place);
+    dadosCEP[sufixo] = {
+        ...comp,
+        formatted_address: place.formatted_address || "",
+        lat:  place.geometry.location.lat(),
+        lng:  place.geometry.location.lng(),
+        place_id: place.place_id || ""
+    };
+
+    // limpa erro
+    const erro = document.getElementById("erro" + sufixo);
+    erro.classList.remove("visivel"); erro.textContent = "";
+
+    // mostra resultado
+    const div = document.getElementById("resultado" + sufixo);
+    div.innerHTML = "📍 " + (place.formatted_address || "Endereço selecionado");
+    div.classList.add("visivel");
+
+    // libera número / complemento
+    const row = document.getElementById("complemento" + sufixo + "Row");
+    if(row) row.classList.remove("hidden");
+}
+
+function mostrarErro(sufixo, msg){
+    const erro = document.getElementById("erro" + sufixo);
+    erro.textContent = msg;
+    erro.classList.add("visivel");
+}
+
+function limparEndereco(sufixo){
+    delete dadosCEP[sufixo];
+    const input = document.getElementById("cep" + sufixo);
+    if(input) input.value = "";
+    const div   = document.getElementById("resultado" + sufixo);
+    div.classList.remove("visivel"); div.innerHTML = "";
+    const row   = document.getElementById("complemento" + sufixo + "Row");
+    if(row) row.classList.add("hidden");
+    const erro  = document.getElementById("erro" + sufixo);
+    erro.classList.remove("visivel"); erro.textContent = "";
+    agendarRecalculoRota();
+}
+
+/* =========================================================
+   MONTAGEM DO ENDEREÇO (mantém assinatura usada em enviar())
+   ========================================================= */
+function montarEndereco(sufixo){
+    const d = dadosCEP[sufixo];
+    if(!d) return "(endereço não preenchido)";
+
+    const numero      = (document.getElementById("numero"      + sufixo) || {}).value || "";
+    const complemento = (document.getElementById("complemento" + sufixo) || {}).value || "";
+
+    // se o usuário só selecionou no autocomplete, usa formatted_address;
+    // se preencheu número/complemento, monta string detalhada.
+    if(!numero && !complemento && d.formatted_address){
+        return d.formatted_address;
+    }
+
+    let end = d.logradouro || "";
+    if(numero)       end += ", " + numero;
+    if(complemento)  end += " " + complemento;
+    if(d.bairro)     end += " - " + d.bairro;
+    if(d.localidade) end += ", " + d.localidade + (d.uf ? "/" + d.uf : "");
+    if(d.cep)        end += " - CEP " + d.cep;
+    if(!end.trim())  end = d.formatted_address || "(endereço não preenchido)";
+    return end;
+}
+
+/* =========================================================
+   ROTA — DirectionsService
+   ========================================================= */
+function setRotaStatus(txt){
+    const el = document.getElementById("rotaStatus");
+    if(el) el.textContent = txt;
+}
+
+function agendarRecalculoRota(){
+    clearTimeout(debounceRota);
+    debounceRota = setTimeout(calcularRota, 600);
+}
+
+function calcularRota(){
+    if(typeof google === "undefined" || !google.maps){
+        setRotaStatus("Aguardando carregamento do mapa...");
+        return;
+    }
+
+    const origem  = dadosCEP["Coleta"];
+    const destino = dadosCEP["Destino"];
+    if(!origem || !destino){
+        document.getElementById("rotaDistancia").textContent = "—";
+        document.getElementById("rotaTempo").textContent     = "—";
+        setRotaStatus("Preencha Coleta e Destino para calcular.");
+        rotaUltima = null;
+        return;
+    }
+
+    const qtdParadas = parseInt(document.getElementById("parada").value, 10) || 0;
+    const waypoints = [];
+    for(let i = 1; i <= qtdParadas; i++){
+        const p = dadosCEP["Parada" + i];
+        if(p) waypoints.push({ location: { lat: p.lat, lng: p.lng }, stopover: true });
+    }
+
+    setRotaStatus("Calculando rota...");
+    const btn = document.getElementById("btnCalcularRota");
+    if(btn) btn.disabled = true;
+
+    const service = new google.maps.DirectionsService();
+    service.route({
+        origin:      { lat: origem.lat,  lng: origem.lng },
+        destination: { lat: destino.lat, lng: destino.lng },
+        waypoints,
+        optimizeWaypoints: false,
+        travelMode: google.maps.TravelMode.DRIVING,
+        region: "br"
+    }, (result, status) => {
+        if(btn) btn.disabled = false;
+
+        if(status !== "OK" || !result || !result.routes || !result.routes[0]){
+            setRotaStatus("Não foi possível calcular a rota (" + status + ").");
+            document.getElementById("rotaDistancia").textContent = "—";
+            document.getElementById("rotaTempo").textContent     = "—";
+            rotaUltima = null;
+            return;
+        }
+
+        let metros = 0, segundos = 0;
+        result.routes[0].legs.forEach(leg => {
+            metros   += leg.distance ? leg.distance.value : 0;
+            segundos += leg.duration ? leg.duration.value : 0;
+        });
+
+        const km          = (metros / 1000);
+        const kmTxt       = km.toLocaleString("pt-BR",{maximumFractionDigits:1}) + " km";
+        const duracaoTxt  = formatarDuracao(segundos);
+
+        document.getElementById("rotaDistancia").textContent = kmTxt;
+        document.getElementById("rotaTempo").textContent     = duracaoTxt;
+        setRotaStatus("Rota calculada com sucesso ✅");
+
+        rotaUltima = { distanciaKm: kmTxt, duracaoTexto: duracaoTxt };
+    });
+}
+
+function formatarDuracao(segundos){
+    const h = Math.floor(segundos / 3600);
+    const m = Math.round((segundos % 3600) / 60);
+    if(h && m) return h + "h " + m + "min";
+    if(h)      return h + "h";
+    return m + "min";
+}
+
+/* =========================================================
+   TOGGLES (preservados)
+   ========================================================= */
+function toggleParadas(){
+    const qtd = parseInt(document.getElementById("parada").value, 10);
+    document.getElementById("parada1Div").classList.toggle("hidden", qtd < 1);
+    document.getElementById("parada2Div").classList.toggle("hidden", qtd < 2);
+    document.getElementById("parada3Div").classList.toggle("hidden", qtd < 3);
+    atualizarParadasAjuda();
+    agendarRecalculoRota();
+}
+
+function toggleAjuda(){
+    document.getElementById("ajudaDiv").classList.toggle("hidden", document.getElementById("ajuda").value !== "sim");
+    atualizarParadasAjuda();
+}
+
+function atualizarParadasAjuda(){
+    const qtd      = parseInt(document.getElementById("parada").value, 10);
+    const temAjuda = document.getElementById("ajuda").value === "sim";
+    document.getElementById("paradaAjuda1").classList.toggle("hidden", !(temAjuda && qtd >= 1));
+    document.getElementById("paradaAjuda2").classList.toggle("hidden", !(temAjuda && qtd >= 2));
+    document.getElementById("paradaAjuda3").classList.toggle("hidden", !(temAjuda && qtd >= 3));
+}
+
+function toggleDesmontar(){
+    document.getElementById("itensDesmontar").classList.toggle("hidden", document.getElementById("desmontar").value !== "sim");
+}
+
+function nivel(id){
+    document.getElementById("nivel"+id).classList.toggle("hidden",
+        document.getElementById("escadas"+id).value !== "escadas");
+}
+
+/* =========================================================
+   CARROSSEL & MÁSCARAS (preservados)
+   ========================================================= */
+let feedbacks = document.querySelectorAll(".feedback");
+let fbIndex   = 0;
+setInterval(() => {
+    feedbacks[fbIndex].classList.remove("active");
+    fbIndex = (fbIndex + 1) % feedbacks.length;
+    feedbacks[fbIndex].classList.add("active");
+}, 3000);
+
+document.getElementById("telefone").addEventListener("input", function(e){
+    let v = e.target.value.replace(/\D/g,"").substring(0,11);
+    if(v.length > 10)     v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+    else if(v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    else if(v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+    else                  v = v.replace(/^(\d*)/, "($1");
+    e.target.value = v;
+});
+
+document.getElementById("data").addEventListener("input", function(e){
+    let v = e.target.value.replace(/\D/g,"");
+    if(v.length >= 2) v = v.slice(0,2) + "/" + v.slice(2);
+    if(v.length >= 5) v = v.slice(0,5) + "/" + v.slice(5,9);
+    e.target.value = v;
+});
+
+document.getElementById("horario").addEventListener("input", function(e){
+    let v = e.target.value.replace(/\D/g,"").substring(0,4);
+    if(v.length >= 3) v = v.slice(0,2) + ":" + v.slice(2);
+    e.target.value = v;
+});
+
+/* limpa estado se usuário apagar tudo manualmente no campo de endereço */
+SUFIXOS_FIXOS.forEach(sufixo => {
+    const input = document.getElementById("cep" + sufixo);
+    if(!input) return;
+    input.addEventListener("input", () => {
+        if(input.value.trim() === "" && dadosCEP[sufixo]){
+            limparEndereco(sufixo);
+        }
+    });
+});
+
+/* =========================================================
+   ENVIO (preserva fluxo + adiciona bloco ROTA)
+   ========================================================= */
+function enviar(){
+    const qtdParadas = parseInt(document.getElementById("parada").value, 10);
+
+    let msg = `*ORÇAMENTO MYFRETES*%0A%0A`;
+    msg += `👤 Cliente: ${document.getElementById("nome").value}%0A`;
+    msg += `📞 Telefone: ${document.getElementById("telefone").value}%0A`;
+    msg += `📅 Data: ${document.getElementById("data").value}%0A`;
+    msg += `⏰ Horário previsto: ${document.getElementById("horario").value}%0A%0A`;
+
+    msg += `📍 *COLETA*%0A${montarEndereco("Coleta")}%0A%0A`;
+
+    for(let i = 1; i <= qtdParadas; i++){
+        msg += `📍 *PARADA ${i}*%0A${montarEndereco("Parada"+i)}%0A%0A`;
+    }
+
+    msg += `📍 *DESTINO*%0A${montarEndereco("Destino")}%0A%0A`;
+
+    if(rotaUltima){
+        msg += `🗺️ *ROTA*%0A`;
+        msg += `Distância: ${rotaUltima.distanciaKm}%0A`;
+        msg += `Tempo estimado: ${rotaUltima.duracaoTexto}%0A%0A`;
+    }
+
+    const itensVal = document.getElementById("itens").value;
+    let listaItens = itensVal.split("\n").map(i => "• " + i).join("%0A");
+    msg += `📦 *ITENS*%0A${listaItens}%0A%0A`;
+
+    const obs = document.getElementById("observacoes").value;
+    if(obs.trim() !== ""){
+        msg += `   *Observações adicionais*%0A${obs.replace(/\n/g,"%0A")}%0A%0A`;
+    }
+
+    if(document.getElementById("ajuda").value === "sim"){
+        msg += `👷 *AJUDANTES*%0AQuantidade: ${document.getElementById("quantidade_ajudante").value}%0A%0A`;
+        msg += `🔹 RETIRADA%0A`;
+        msg += `Tipo local: ${document.getElementById("acesso1").value}%0A`;
+        msg += `Fácil acesso: ${document.getElementById("local1").value}%0A`;
+        msg += `Acesso: ${document.getElementById("escadas1").value}%0A`;
+        if(document.getElementById("escadas1").value === "escadas")
+            msg += `Andares: ${document.getElementById("nivel1").value}%0A`;
+        msg += `%0A`;
+
+        for(let i = 1; i <= qtdParadas; i++){
+            const escP = document.getElementById("escadasP"+i);
+            const nivP = document.getElementById("nivelP"+i);
+            msg += `🔹 PARADA ${i} (ajudantes)%0A`;
+            msg += `Tipo local: ${document.getElementById("acessoP"+i).value}%0A`;
+            msg += `Fácil acesso: ${document.getElementById("localP"+i).value}%0A`;
+            msg += `Acesso: ${escP.value}%0A`;
+            if(escP.value === "escadas") msg += `Andares: ${nivP.value}%0A`;
+            msg += `%0A`;
+        }
+
+        msg += `🔹 DESTINO%0A`;
+        msg += `Tipo local: ${document.getElementById("acesso2").value}%0A`;
+        msg += `Fácil acesso: ${document.getElementById("local2").value}%0A`;
+        msg += `Acesso: ${document.getElementById("escadas2").value}%0A`;
+        if(document.getElementById("escadas2").value === "escadas")
+            msg += `Andares: ${document.getElementById("nivel2").value}%0A`;
+
+        const desmontar = document.getElementById("desmontar").value;
+        msg += `🛠️ Desmontagem: ${desmontar}%0A`;
+        if(desmontar === "sim")
+            msg += `Itens para desmontar: ${document.getElementById("itensDesmontar").value}%0A`;
+
+        const embalagem = document.getElementById("embalagem").value;
+        msg += `📦 Embalagem: ${embalagem === "sim" ? "Sim, embalagem completa" : "Não"}%0A`;
+    }
+
+    window.open("https://wa.me/5531975135130?text=" + msg, "_blank");
+}
+
+/* tratamento global de erro de auth do Google Maps */
+window.gm_authFailure = function(){
+    setRotaStatus("Falha de autenticação Google Maps (verifique restrições da chave).");
+    SUFIXOS_FIXOS.forEach(s => mostrarErro(s, "Falha ao carregar Google Maps."));
+};
+</script>
+
+<!-- Google Maps JavaScript API (Places + Directions) -->
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDVh8-wXJFjiYKnnas83xbrnPjnd7wI5Ho&libraries=places&language=pt-BR&region=BR&callback=initMaps"></script>
+
+</body>
+</html>
