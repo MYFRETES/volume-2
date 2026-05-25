@@ -460,10 +460,18 @@ button:active{transform:scale(0.97);}
       <input id="itensDesmontar" class="hidden" placeholder="Quais itens?">
 
       <h4>📦 Embalagem dos Itens</h4>
-      <select id="embalagem">
+      <select id="embalagem" onchange="toggleEmbalagem()">
         <option value="nao">Não</option>
-        <option value="sim">Sim, embalagem completa</option>
+        <option value="completa">Sim, embalagem completa de todos os itens listados</option>
+        <option value="parcial">Sim, selecionar itens a embalar</option>
       </select>
+      <div id="embalagemItensContainer" class="hidden">
+        <div style="margin-top:6px;font-size:0.9em;">Selecione os itens que deseja embalar:</div>
+        <div id="embalagemItensLista"></div>
+        <div id="embalagemItensVazio" class="hidden" style="font-size:0.85em;opacity:0.8;">
+          ⚠️ Liste primeiro os itens em "Itens a transportar".
+        </div>
+      </div>
     </div>
   </div>
 
@@ -718,6 +726,88 @@ function toggleDesmontar(){
     document.getElementById("itensDesmontar").classList.toggle("hidden", document.getElementById("desmontar").value !== "sim");
 }
 
+/* =========================================================
+   EMBALAGEM DOS ITENS — 3 opções:
+   "nao"      → sem campos adicionais
+   "completa" → todos os itens listados em "Itens a transportar"
+   "parcial"  → checkbox list dinâmica vinda do textarea #itens
+   ========================================================= */
+function getItensTransportar(){
+    return document.getElementById("itens").value
+        .split("\n")
+        .map(i => i.trim())
+        .filter(i => i.length > 0);
+}
+
+function renderEmbalagemChecklist(){
+    const lista = document.getElementById("embalagemItensLista");
+    const vazio = document.getElementById("embalagemItensVazio");
+    if(!lista) return;
+
+    // Preserva seleções anteriores pelo texto do item
+    const selecionadosAntes = new Set(
+        Array.from(lista.querySelectorAll('input[type="checkbox"]:checked'))
+             .map(cb => cb.value)
+    );
+
+    const itens = getItensTransportar();
+    lista.innerHTML = "";
+
+    if(itens.length === 0){
+        vazio.classList.remove("hidden");
+        return;
+    }
+    vazio.classList.add("hidden");
+
+    itens.forEach((item, idx) => {
+        const id = "embItem_" + idx;
+        const label = document.createElement("label");
+        label.setAttribute("for", id);
+        label.style.display = "flex";
+        label.style.alignItems = "center";
+        label.style.gap = "8px";
+        label.style.padding = "4px 0";
+        label.style.cursor = "pointer";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.id = id;
+        cb.value = item;
+        cb.className = "embalagem-item-cb";
+        if(selecionadosAntes.has(item)) cb.checked = true;
+
+        const span = document.createElement("span");
+        span.textContent = item;
+
+        label.appendChild(cb);
+        label.appendChild(span);
+        lista.appendChild(label);
+    });
+}
+
+function toggleEmbalagem(){
+    const valor = document.getElementById("embalagem").value;
+    const container = document.getElementById("embalagemItensContainer");
+    if(valor === "parcial"){
+        container.classList.remove("hidden");
+        renderEmbalagemChecklist();
+    } else {
+        container.classList.add("hidden");
+    }
+}
+
+// Mantém a checklist sincronizada quando o usuário edita "Itens a transportar"
+document.addEventListener("DOMContentLoaded", function(){
+    const itensEl = document.getElementById("itens");
+    if(itensEl){
+        itensEl.addEventListener("input", function(){
+            if(document.getElementById("embalagem").value === "parcial"){
+                renderEmbalagemChecklist();
+            }
+        });
+    }
+});
+
 function nivel(id){
     document.getElementById("nivel"+id).classList.toggle("hidden",
         document.getElementById("escadas"+id).value !== "escadas");
@@ -848,7 +938,17 @@ function enviar(){
             msg += `Itens para desmontar: ${document.getElementById("itensDesmontar").value}%0A`;
 
         const embalagem = document.getElementById("embalagem").value;
-        msg += `📦 Embalagem: ${embalagem === "sim" ? "Sim, embalagem completa" : "Não"}%0A`;
+        if(embalagem === "completa"){
+            msg += `📦 Embalagem dos itens: Sim — embalagem completa de todos os itens%0A`;
+        } else if(embalagem === "parcial"){
+            const selecionados = Array.from(
+                document.querySelectorAll('#embalagemItensLista input[type="checkbox"]:checked')
+            ).map(cb => cb.value);
+            msg += `📦 Embalagem dos itens: Sim — itens selecionados%0A`;
+            msg += `Itens para embalar: ${selecionados.length ? selecionados.join(", ") : "(nenhum item selecionado)"}%0A`;
+        } else {
+            msg += `📦 Embalagem dos itens: Não%0A`;
+        }
     } else {
         msg += `👷 *AJUDANTES*%0APrecisa de ajudante: Não%0A%0A`;
     }
