@@ -161,6 +161,49 @@ button:active{transform:scale(0.97);}
 .pac-item{padding:8px 10px;cursor:pointer;}
 .pac-item:hover{background:#f3eaff;}
 .pac-item-query{color:#4B0082;font-weight:bold;}
+
+/* ── Checklist "Sim, selecionar itens a embalar" ──
+   Lista vertical limpa, na MESMA ordem digitada em "Itens a transportar".
+   Neutraliza o estilo global de `input` para os checkboxes desta lista. */
+#embalagemItensLista{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-top:8px;
+}
+#embalagemItensLista .embalagem-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    border-radius:8px;
+    background:#f7f2ff;
+    border:1px solid #e3d4ff;
+    color:#4B0082;
+    font-size:14px;
+    line-height:1.3;
+    cursor:pointer;
+    width:100%;
+    box-sizing:border-box;
+}
+#embalagemItensLista .embalagem-item:hover{background:#efe3ff;}
+#embalagemItensLista .embalagem-item input[type="checkbox"]{
+    /* Reset do estilo global de inputs */
+    width:18px;
+    min-width:18px;
+    height:18px;
+    margin:0;
+    padding:0;
+    border:none;
+    border-radius:0;
+    accent-color:#8000ff;
+    flex-shrink:0;
+    cursor:pointer;
+}
+#embalagemItensLista .embalagem-item-text{
+    flex:1;
+    word-break:break-word;
+}
 </style>
 </head>
 
@@ -763,11 +806,7 @@ function renderEmbalagemChecklist(){
         const id = "embItem_" + idx;
         const label = document.createElement("label");
         label.setAttribute("for", id);
-        label.style.display = "flex";
-        label.style.alignItems = "center";
-        label.style.gap = "8px";
-        label.style.padding = "4px 0";
-        label.style.cursor = "pointer";
+        label.className = "embalagem-item";
 
         const cb = document.createElement("input");
         cb.type = "checkbox";
@@ -777,6 +816,7 @@ function renderEmbalagemChecklist(){
         if(selecionadosAntes.has(item)) cb.checked = true;
 
         const span = document.createElement("span");
+        span.className = "embalagem-item-text";
         span.textContent = item;
 
         label.appendChild(cb);
