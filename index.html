@@ -812,9 +812,10 @@ function enviar(){
         msg += `   *Observações adicionais*%0A${obs.replace(/\n/g,"%0A")}%0A%0A`;
     }
 
-    if(document.getElementById("ajuda").value === "sim"){
+    const ajudaVal = document.getElementById("ajuda").value;
+    if(ajudaVal === "sim"){
         const qtdAjudVal = document.getElementById("quantidade_ajudante").value;
-        msg += `👷 *AJUDANTES*%0AQuantidade: ${descreverQtdAjudante(qtdAjudVal)}%0A%0A`;
+        msg += `👷 *AJUDANTES*%0APrecisa de ajudante: Sim%0AQuantidade: ${descreverQtdAjudante(qtdAjudVal)}%0A%0A`;
         msg += `🔹 RETIRADA%0A`;
         msg += `Tipo local: ${document.getElementById("acesso1").value}%0A`;
         msg += `Fácil acesso: ${document.getElementById("local1").value}%0A`;
@@ -848,6 +849,8 @@ function enviar(){
 
         const embalagem = document.getElementById("embalagem").value;
         msg += `📦 Embalagem: ${embalagem === "sim" ? "Sim, embalagem completa" : "Não"}%0A`;
+    } else {
+        msg += `👷 *AJUDANTES*%0APrecisa de ajudante: Não%0A%0A`;
     }
 
     window.open("https://wa.me/5531975135130?text=" + msg, "_blank");
